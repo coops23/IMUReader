@@ -1,0 +1,25 @@
+﻿<Properties StartupItem="Assembly-CSharp.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\SteamVR\readme.txt">
+    <Files>
+      <File FileName="Assets\Scripts\SerialMonitor.cs" Line="37" Column="15" />
+      <File FileName="Assets\SteamVR\Scripts\SteamVR_TrackedObject.cs" Line="30" Column="11" />
+      <File FileName="Assets\SteamVR\Scripts\SteamVR_ControllerManager.cs" Line="1" Column="1" />
+      <File FileName="Assets\SteamVR\Scripts\SteamVR_Controller.cs" Line="140" Column="34" />
+      <File FileName="Assets\SteamVR\Scripts\SteamVR.cs" Line="1" Column="1" />
+      <File FileName="Assets\SteamVR\Scripts\SteamVR_Stats.cs" Line="1" Column="1" />
+      <File FileName="Assets\SteamVR\Scripts\SteamVR_UpdatePoses.cs" Line="1" Column="1" />
+      <File FileName="Assets\SteamVR\Plugins\openvr_api.cs" Line="25" Column="30" />
+      <File FileName="Assets\SteamVR\Scripts\SteamVR_Utils.cs" Line="287" Column="23" />
+      <File FileName="Assets\SteamVR\Scripts\SteamVR_SphericalProjection.cs" Line="1" Column="1" />
+      <File FileName="Assets\SteamVR\Scripts\SteamVR_TestController.cs" Line="50" Column="34" />
+      <File FileName="Assets\SteamVR\Extras\SteamVR_TrackedController.cs" Line="83" Column="6" />
+      <File FileName="Assets\SteamVR\Extras\SteamVR_LaserPointer.cs" Line="1" Column="1" />
+      <File FileName="Assets\SteamVR\readme.txt" Line="500" Column="44" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

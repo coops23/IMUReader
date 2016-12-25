@@ -199,7 +199,7 @@ int IMU::Initialize(float timeConstant)
 int IMU::Initialize(float timeConstant, uint8_t address)
 {
     uint8_t c = readByte(address, WHO_AM_I_MPU6050);  // Read WHO_AM_I register for MPU-6050
-
+    
     _time_constant = timeConstant;
     _address = address;
     
