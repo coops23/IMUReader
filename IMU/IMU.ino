@@ -24,8 +24,9 @@ void loop()
 {  
     if(imu.Update())
     {
-        Serial.print("Info: "); Serial.print(imu.GetYaw()); Serial.print(" "); Serial.print(imu.GetPitch() * (180.0f/PI)); Serial.print(" "); Serial.print(imu.GetRoll() * (180.0f/PI)); Serial.print(" ");
-        Serial.print(imu.GetAccelX()); Serial.print(" "); Serial.print(imu.GetAccelY()); Serial.print(" "); Serial.print(imu.GetAccelZ()); Serial.print(" ");
+        //Serial.print("Info: "); Serial.print(imu.GetYaw()); Serial.print(" "); Serial.print(imu.GetPitch()); Serial.print(" "); Serial.println(imu.GetRoll());
+        Serial.print("Info: "); Serial.print(imu.GetAccelX()); Serial.print(" "); Serial.print(imu.GetAccelY()); Serial.print(" "); Serial.print(imu.GetAccelZ()); Serial.print(" ");
+        Serial.print(imu.GetFilteredAccelX()); Serial.print(" "); Serial.print(imu.GetFilteredAccelY()); Serial.print(" "); Serial.print(imu.GetFilteredAccelZ()); Serial.print(" ");
         Serial.println(imu.GetDeltaT());
     }   
 }

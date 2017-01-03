@@ -50,6 +50,9 @@
         float GetAccelX();
         float GetAccelY();
         float GetAccelZ();
+        float GetFilteredAccelX();
+        float GetFilteredAccelY();
+        float GetFilteredAccelZ();
         float GetGyroX();
         float GetGyroY();
         float GetGyroZ();
@@ -63,7 +66,9 @@
         int8_t _address; //I2C device's address      
         float _yaw, _pitch, _roll; //orientation angle in degrees
         int16_t _accelCount[3];  // Stores the 16-bit signed accelerometer sensor output
-        float _ax, _ay, _az;       // Stores the real accel value in g's
+        float _a[3];       // Stores the real accel value in g's
+        float _aPrevious[3];
+        float _aFiltered[3];
         int16_t _gyroCount[3];   // Stores the 16-bit signed gyro sensor output
         float _gx, _gy, _gz;       // Stores the real gyro value in degrees per seconds
         float _gyroBias[3] = {0, 0, 0}; 
@@ -86,6 +91,7 @@
         float _time_constant;
         
         void MadgwickSensorFusionAlgorithm(float ax, float ay, float az, float gx, float gy, float gz);
+        void RemoveGravity();
         
         void initMPU6050();
         void calibrateMPU6050(float * dest1, float * dest2);

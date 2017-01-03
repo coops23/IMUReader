@@ -129,9 +129,8 @@
 
 #include "IMU.h"
 #include <Arduino.h>
-#include <Wire.h>
-#include <stdint.h>
 #include <Math.h>
+#include <Wire.h>
 
 // Set initial input parameters
 enum Ascale {
@@ -232,9 +231,8 @@ int IMU::Update()
 {
     int newData = 0;
     uint32_t Now = 0;
-    float dt = 0;
-    float norm; 
-    
+    float norm;    
+        
     // If data ready bit set, all data registers have new data
     if(readByte(_address, INT_STATUS) & 0x01) {  // check if data ready interrupt
         float pitchGyro = 0, pitchAccel = 0;
@@ -244,9 +242,9 @@ int IMU::Update()
         getAres();
         
         // Now we'll calculate the acceleration value into actual g's
-        _ax = (float)_accelCount[0]*_aRes;  // get actual g value, this depends on scale being set
-        _ay = (float)_accelCount[1]*_aRes;   
-        _az = (float)_accelCount[2]*_aRes;  
+        _a[0] = (float)_accelCount[0]*_aRes;  // get actual g value, this depends on scale being set
+        _a[1] = (float)_accelCount[1]*_aRes;   
+        _a[2] = (float)_accelCount[2]*_aRes;  
         
         readGyroData(_gyroCount);  // Read the x/y/z adc values
         getGres();
@@ -258,13 +256,13 @@ int IMU::Update()
         
         _temperature = ((float) readTempData()) / 340. + 36.53; // Temperature in degrees Centigrade       
 
-        newData = 1;
+        newData = 1;         
 
         //Get the change in time
         Now = millis();
         _deltat = (float) (Now - _time);
         _time = Now;
-
+        
         //Calculate angles with gyro
         //Note that we need to use real time in seconds and to avoid truncating data 
         pitchGyro = ((_pitch * 1000) + (_gx * _deltat));
@@ -275,8 +273,8 @@ int IMU::Update()
         _yaw /= 1000;
 
         //Calculate angle with accelerometer
-        pitchAccel = atan2(_ay,  _az);
-        rollAccel = atan2((-_ax), (sqrt(_ay * _ay + _az * _az)));
+        pitchAccel = atan2(_a[1],  _a[2]);
+        rollAccel = atan2((-_a[0]), (sqrt(_a[1] * _a[1] + _a[2] * _a[2])));
 
         //Use Complimentary Filter on pitch and roll. Can't do this with yaw.
         float alpha = _time_constant / (_time_constant + _deltat);
@@ -296,23 +294,31 @@ int IMU::Update()
         _q[1] = t0 * t3 * t4 - t1 * t2 * t5;
         _q[2] = t0 * t2 * t5 + t1 * t3 * t4;
         _q[3] = t1 * t2 * t4 - t0 * t3 * t5;
+
+        float alphaHighPass = 5 / (5 + (_deltat/1000));
+        int i = 0;
+    
+        for(i = 0; i < 3; i++)
+        {
+            _aFiltered[i] = alphaHighPass * (_aFiltered[i] + _a[i] - _aPrevious[i]);
+            _aPrevious[i] = _a[i];
+        }
     }
       
     if(Now > 10000000uL) {
       _beta = 0.041; // decrease filter gain after stabilized
       _zeta = 0.015; // increase gyro bias drift gain after stabilized
     }
+
+    
     
     /*
     // Pass gyro rate as rad/s
-    MadgwickSensorFusionAlgorithm(_ax, _ay, _az, _gx*PI/180.0f, _gy*PI/180.0f, _gz*PI/180.0f);
+    MadgwickSensorFusionAlgorithm(_a[0], _a[1], _a[2], _gx*PI/180.0f, _gy*PI/180.0f, _gz*PI/180.0f);
     
     _yaw   = atan2(2.0f * (_q[1] * _q[2] + _q[0] * _q[3]), _q[0] * _q[0] + _q[1] * _q[1] - _q[2] * _q[2] - _q[3] * _q[3]);   
     _pitch = -asin(2.0f * (_q[1] * _q[3] - _q[0] * _q[2]));
-    _roll  = atan2(2.0f * (_q[0] * _q[1] + _q[2] * _q[3]), _q[0] * _q[0] - _q[1] * _q[1] - _q[2] * _q[2] + _q[3] * _q[3]);
-    _pitch *= 180.0f / PI;
-    _yaw   *= 180.0f / PI; 
-    _roll  *= 180.0f / PI;*/
+    _roll  = atan2(2.0f * (_q[0] * _q[1] + _q[2] * _q[3]), _q[0] * _q[0] - _q[1] * _q[1] - _q[2] * _q[2] + _q[3] * _q[3]);*/
     
     return newData;
 }
@@ -339,17 +345,32 @@ float IMU::GetQuaternion3()
 
 float IMU::GetAccelX()
 {
-    return _ax; 
+    return _a[0]; 
 }
 
 float IMU::GetAccelY()
 {
-    return _ay;  
+    return _a[1];  
 }
 
 float IMU::GetAccelZ()
 {
-    return _az;  
+    return _a[2];  
+}
+
+float IMU::GetFilteredAccelX()
+{
+    return _aFiltered[0]; 
+}
+
+float IMU::GetFilteredAccelY()
+{
+    return _aFiltered[1];  
+}
+
+float IMU::GetFilteredAccelZ()
+{
+    return _aFiltered[2];  
 }
 
 float IMU::GetGyroX()
@@ -374,12 +395,12 @@ float IMU::GetYaw()
 
 float IMU::GetPitch()
 {
-    return _pitch;  
+    return _pitch * (180.0f / PI);  
 }
 
 float IMU::GetRoll()
 {
-    return _roll; 
+    return _roll * (180.0f / PI); 
 }
 
 uint32_t IMU::GetDeltaT()
