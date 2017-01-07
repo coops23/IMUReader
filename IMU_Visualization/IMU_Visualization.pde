@@ -5,7 +5,6 @@ Serial myPort;
 class StopWatchTimer {
   int startTime = 0, stopTime = 0;
   boolean running = false;  
-  
     
     void start() {
         startTime = millis();
@@ -46,25 +45,17 @@ class StopWatchTimer {
 }
 
 StopWatchTimer sw = new StopWatchTimer();
-float G_TO_MS3_CONVERSION = (9806.65f);
 
-float yaw = 0.0;
-float pitch = 0.0;
-float roll = 0.0;
-float ax = 0.0;
-float ay = 0.0;
-float az = 0.0;
+float G_TO_MS3_CONVERSION = 9806.65f;
+float LSB_TO_G = 8192;
+
 float qs = 0.0;
 float qx = 0.0;
 float qy = 0.0;
 float qz = 0.0;
 float delta_t = 0.0;
-float timeConstantHighPass = 0.0001;
-
+float[] ypr = {0,0,0,0};
 float[] a = {0,0,0,0};
-float[] aRaw = {0,0,0,0};
-float[] aPrevious = {0,0,0,0};
-float[] aPreviousRaw = {0,0,0,0};
 float[] v = {0,0,0,0};
 float[] s = {0,0,0,0};
 float[] vPrevious = {0,0,0,0};
@@ -74,8 +65,8 @@ void setup()
 {
   size(600, 500, P3D);
 
-  //myPort = new Serial(this, "COM4", 38400);                    // Windows
-  myPort = new Serial(this, "/dev/tty.usbmodem1965331", 115200);             // Linux
+  myPort = new Serial(this, "COM3", 115200);                    // Windows
+  //myPort = new Serial(this, "/dev/tty.usbmodem1965331", 115200);             // Linux
   //myPort = new Serial(this, "/dev/cu.usbmodem1217321", 9600);  // Mac
 
   textSize(16); // set text size
@@ -93,44 +84,38 @@ void draw()
 
   pushMatrix(); // begin object
 
-  float c1 = cos(radians(roll));
-  float s1 = sin(radians(roll));
-  float c2 = cos(radians(pitch));
-  float s2 = sin(radians(pitch));
-  float c3 = cos(radians(yaw));
-  float s3 = sin(radians(yaw));
-  /*applyMatrix( c2*c3, s1*s3+c1*c3*s2, c3*s1*s2-c1*s3, 0,
+  float c1 = cos(radians(ypr[2]));
+  float s1 = sin(radians(ypr[2]));
+  float c2 = cos(radians(ypr[1]));
+  float s2 = sin(radians(ypr[1]));
+  float c3 = cos(radians(ypr[0]));
+  float s3 = sin(radians(ypr[0]));
+  applyMatrix( c2*c3, s1*s3+c1*c3*s2, c3*s1*s2-c1*s3, 0,
                -s2, c1*c2, c2*s1, 0,
                c2*s3, c1*s2*s3-c3*s1, c1*c3+s1*s2*s3, 0,
-               0, 0, 0, 1);*/
+               0, 0, 0, 1);
 
   drawArduino();
 
   popMatrix(); // end of object
 
   // Print values to console
-  /*print(roll);
+  print(ypr[2]);
   print("\t");
-  print(pitch);
+  print(ypr[1]);
   print("\t");
-  print(yaw);
-  print("\t");*/
-  /*print(ax);
+  print(ypr[0]);
   print("\t");
-  print(ay);
-  print("\t");
-  print(az);
-  print("\t");*/
   print(s[0]);
   print("\t");
   print(s[1]);
   print("\t");
   print(s[2]);
   print("\t");
-  //print(delta_t/1000);
+  print(delta_t/1000);
   println();
   
-  if(sw.getElapsedTime() > 2000 && sw.Running())
+  if(sw.getElapsedTime() > 10000 && sw.Running())
   {
      int i =0;
      for(i = 0; i< 3;i++)
@@ -140,8 +125,6 @@ void draw()
      }
      sw.clear();
      sw.start();
-     
-     timeConstantHighPass = 5;
   }
 }
 
@@ -153,28 +136,21 @@ void serialEvent()
     message = myPort.readStringUntil(newLine); // read from port until new line
     if (message != null) {
       String[] list = split(trim(message), " ");
-      if (list.length >= 9 && list[0].equals("Info:")) {
-        //yaw = float(list[1]); // convert to float yaw
-        //pitch = float(list[2]); // convert to float pitch
-        //roll = float(list[3]); // convert to float roll
-        ax = float(list[1]);
-        ay = float(list[2]);
-        az = float(list[3]);
-        qs = float(list[4]);
-        qx = float(list[5]);
-        qy = float(list[6]);
-        qz = float(list[7]);
-        delta_t = float(list[8]);
+      if (list.length >= 12 && list[0].equals("Info:")) {
+        ypr[0] = float(list[1]);
+        ypr[1] = float(list[2]);
+        ypr[2] = float(list[3]); 
+        a[0] = (float(list[4]) / LSB_TO_G) * G_TO_MS3_CONVERSION;
+        a[1] = (float(list[5]) / LSB_TO_G) * G_TO_MS3_CONVERSION;
+        a[2] = (float(list[6]) / LSB_TO_G) * G_TO_MS3_CONVERSION;
+        qs = float(list[7]);
+        qx = float(list[8]);
+        qy = float(list[9]);
+        qz = float(list[10]);
+        delta_t = float(list[11]);
       }
     }
   } while (message != null);
-  
-  ax /= 2032;
-  ay /= 2032;
-  az /= 2032;
-  a[0] = ax * G_TO_MS3_CONVERSION;
-  a[1] = ay * G_TO_MS3_CONVERSION;
-  a[2] = az * G_TO_MS3_CONVERSION;
 }
 
 void drawArduino()
@@ -201,34 +177,11 @@ void drawArduino()
   fill(0,100,100);
   
   translate(0, 100, 0);
-  //RemoveGravity(ax, ay, az, delta_t/1000, a);
   
   Deadreckoning(delta_t/1000);
-  translate(s[1],s[2],s[0]);
+  translate(s[1],-s[2],s[0]);
   box(30,30,30);
-}
-
-void RemoveGravity(float ax, float ay, float az, float time, float[] a)
-{
-  int i = 0;
-  float alphaHighPass = timeConstantHighPass / (timeConstantHighPass + time); //use real time in seconds
-
-  aRaw[0] = ax;
-  aRaw[1] = ay;
-  aRaw[2] = az;
-  
-  for(i = 0; i < 3; i++) //<>//
-  {  
-      a[i] = alphaHighPass * (aPrevious[i] + aRaw[i] - aPreviousRaw[i]);
-  } 
- //<>//
-  aPrevious[0] = a[0];
-  aPrevious[1] = a[1];
-  aPrevious[2] = a[2];
-  aPreviousRaw[0] = ax;
-  aPreviousRaw[1] = ay;
-  aPreviousRaw[2] = az;
-}
+} //<>// //<>//
 
 void Deadreckoning(float delta_t)
 {
