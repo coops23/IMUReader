@@ -74,8 +74,8 @@ void setup()
 {
   size(600, 500, P3D);
 
-  myPort = new Serial(this, "COM4", 38400);                    // Windows
-  //myPort = new Serial(this, "/dev/ttyACM0", 9600);             // Linux
+  //myPort = new Serial(this, "COM4", 38400);                    // Windows
+  myPort = new Serial(this, "/dev/tty.usbmodem1965331", 115200);             // Linux
   //myPort = new Serial(this, "/dev/cu.usbmodem1217321", 9600);  // Mac
 
   textSize(16); // set text size
@@ -115,22 +115,22 @@ void draw()
   print("\t");
   print(yaw);
   print("\t");*/
-  print(ax);
+  /*print(ax);
   print("\t");
   print(ay);
   print("\t");
   print(az);
+  print("\t");*/
+  print(s[0]);
   print("\t");
-  print(a[0]);
+  print(s[1]);
   print("\t");
-  print(a[1]);
-  print("\t");
-  print(a[2]);
+  print(s[2]);
   print("\t");
   //print(delta_t/1000);
   println();
   
-  if(sw.getElapsedTime() > 500 && sw.Running())
+  if(sw.getElapsedTime() > 2000 && sw.Running())
   {
      int i =0;
      for(i = 0; i< 3;i++)
@@ -139,7 +139,7 @@ void draw()
        sPrevious[i] = 0;
      }
      sw.clear();
-     //sw.start();
+     sw.start();
      
      timeConstantHighPass = 5;
   }
@@ -153,21 +153,28 @@ void serialEvent()
     message = myPort.readStringUntil(newLine); // read from port until new line
     if (message != null) {
       String[] list = split(trim(message), " ");
-      if (list.length >= 12 && list[0].equals("Info:")) {
-        yaw = float(list[1]); // convert to float yaw
-        pitch = float(list[2]); // convert to float pitch
-        roll = float(list[3]); // convert to float roll
-        ax = float(list[4]);
-        ay = float(list[5]);
-        az = float(list[6]);
-        qs = float(list[7]);
-        qx = float(list[8]);
-        qy = float(list[9]);
-        qz = float(list[10]);
-        delta_t = float(list[11]);
+      if (list.length >= 9 && list[0].equals("Info:")) {
+        //yaw = float(list[1]); // convert to float yaw
+        //pitch = float(list[2]); // convert to float pitch
+        //roll = float(list[3]); // convert to float roll
+        ax = float(list[1]);
+        ay = float(list[2]);
+        az = float(list[3]);
+        qs = float(list[4]);
+        qx = float(list[5]);
+        qy = float(list[6]);
+        qz = float(list[7]);
+        delta_t = float(list[8]);
       }
     }
   } while (message != null);
+  
+  ax /= 2032;
+  ay /= 2032;
+  az /= 2032;
+  a[0] = ax * G_TO_MS3_CONVERSION;
+  a[1] = ay * G_TO_MS3_CONVERSION;
+  a[2] = az * G_TO_MS3_CONVERSION;
 }
 
 void drawArduino()
@@ -194,9 +201,10 @@ void drawArduino()
   fill(0,100,100);
   
   translate(0, 100, 0);
-  RemoveGravity(ax, ay, az, delta_t/1000, a);
+  //RemoveGravity(ax, ay, az, delta_t/1000, a);
+  
   Deadreckoning(delta_t/1000);
-  translate(s[1]*G_TO_MS3_CONVERSION,s[2]*G_TO_MS3_CONVERSION,s[0]*G_TO_MS3_CONVERSION);
+  translate(s[1],s[2],s[0]);
   box(30,30,30);
 }
 
