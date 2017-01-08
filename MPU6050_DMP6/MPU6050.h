@@ -438,7 +438,7 @@ class MPU6050 {
         MPU6050();
         MPU6050(uint8_t address);
 
-        void initialize();
+        void initialize(uint8_t address);
         bool testConnection();
 
         // AUX_VDDIO register

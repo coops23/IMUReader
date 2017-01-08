@@ -87,6 +87,7 @@ class Quaternion {
             r.normalize();
             return r;
         }
+
 };
 
 class VectorInt16 {
