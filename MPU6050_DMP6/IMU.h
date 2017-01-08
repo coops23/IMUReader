@@ -33,6 +33,10 @@ class IMU {
         float GetWorldYaw(); //returns Yaw in world frame
         float GetWorldPitch(); //returns Pitch in the world frame
         float GetWorldRoll(); //returns Roll in the world frame
+
+        float GetGravityX(); //returns X component of gravity in local frame
+        float GetGravityY(); //returns Y component of gravity in local frame
+        float GetGravityZ(); //returns Z component of gravity in local frame
         
         float GetAccelX(); //returns raw readings in LSB/g (+8192 per +g)
         float GetAccelY(); //returns raw readings in LSB/g

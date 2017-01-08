@@ -127,9 +127,20 @@ void loop() {
    {
       if(imuTwo.Process())
       {
-         Serial.print(imuOne.GetWorldPitch() * 180/M_PI);
+         /*Serial.print(imuOne.GetWorldPitch() * 180/M_PI);
          Serial.print(" ");
-         Serial.println(imuTwo.GetWorldPitch() * 180/M_PI);
+         Serial.println(imuTwo.GetWorldPitch() * 180/M_PI);*/
+         Serial.print(imuOne.GetGravityX());
+         Serial.print(" ");
+         Serial.print(imuOne.GetGravityY());
+         Serial.print(" ");
+         Serial.print(imuOne.GetGravityZ());
+         Serial.print(" ");
+         Serial.print(imuTwo.GetGravityX());
+         Serial.print(" ");
+         Serial.print(imuTwo.GetGravityY());
+         Serial.print(" ");
+         Serial.println(imuTwo.GetGravityZ());
       }
    }
 }

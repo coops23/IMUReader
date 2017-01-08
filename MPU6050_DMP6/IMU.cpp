@@ -135,6 +135,21 @@ float IMU::GetWorldAccelZ()
     return _aaWorld.z;
 }
 
+float IMU::GetGravityX()
+{
+    return _gravity.x;
+}
+
+float IMU::GetGravityY()
+{
+    return _gravity.y;
+}
+
+float IMU::GetGravityZ()
+{
+    return _gravity.z;
+}
+        
 float IMU::GetWorldYaw()
 {
     return _ypr[0];
