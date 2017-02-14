@@ -65,8 +65,8 @@ void setup()
 {
   size(600, 500, P3D);
 
-  myPort = new Serial(this, "COM3", 115200);                    // Windows
-  //myPort = new Serial(this, "/dev/tty.usbmodem1965331", 115200);             // Linux
+  //myPort = new Serial(this, "COM3", 9600);                    // Windows
+  myPort = new Serial(this, "/dev/tty.usbmodem1965331", 9600);             // Linux
   //myPort = new Serial(this, "/dev/cu.usbmodem1217321", 9600);  // Mac
 
   textSize(16); // set text size
@@ -84,7 +84,7 @@ void draw()
 
   pushMatrix(); // begin object
 
-  float c1 = cos(radians(ypr[2]));
+  /*float c1 = cos(radians(ypr[2]));
   float s1 = sin(radians(ypr[2]));
   float c2 = cos(radians(ypr[1]));
   float s2 = sin(radians(ypr[1]));
@@ -93,7 +93,7 @@ void draw()
   applyMatrix( c2*c3, s1*s3+c1*c3*s2, c3*s1*s2-c1*s3, 0,
                -s2, c1*c2, c2*s1, 0,
                c2*s3, c1*s2*s3-c3*s1, c1*c3+s1*s2*s3, 0,
-               0, 0, 0, 1);
+               0, 0, 0, 1);*/
 
   drawArduino();
 

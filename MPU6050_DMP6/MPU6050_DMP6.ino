@@ -41,8 +41,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ===============================================
 */
-#define INTERRUPT_PIN_IMU_ONE 2
-#define INTERRUPT_PIN_IMU_TWO 3
+#define INTERRUPT_PIN_IMU_ONE 8
+#define INTERRUPT_PIN_IMU_TWO 9
 
 #include "IMU.h"
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
@@ -59,21 +59,21 @@ void setup() {
     // the baud timing being too misaligned with processor ticks. You must use
     // 38400 or slower in these cases, or use some kind of external separate
     // crystal solution for the UART timer.
-    Serial.begin(38400);
+    Serial.begin(9600);
     
     pinMode(INTERRUPT_PIN_IMU_ONE, INPUT);
     pinMode(INTERRUPT_PIN_IMU_TWO, INPUT);
-    attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN_IMU_ONE), ImuOneDataReady, RISING);
-    attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN_IMU_TWO), ImuTwoDataReady, RISING);
-    imuOne.Initialize(0x68, -3348, 9999, 210, 220, 76, -85);
-    imuTwo.Initialize(0x69, -3348, 9999, 806, 220, 76, -85);
+    attachInterrupt(INTERRUPT_PIN_IMU_ONE, ImuOneDataReady, RISING);
+    attachInterrupt(INTERRUPT_PIN_IMU_TWO, ImuTwoDataReady, RISING);
+    imuOne.Initialize(0x68, -3348, 9999, 806, 220, 76, -85);
+    imuTwo.Initialize(0x69, -3348, 9999, 1240, 220, 76, -85);
 }
 
 void loop() { 
     
-    /*if(imuOne.Process())
+    if(imuOne.Process())
     {
-        Serial.print("Info1: ");
+        Serial.print("Info: ");
         Serial.print(imuOne.GetWorldYaw() * 180/M_PI);
         Serial.print(" ");
         Serial.print(imuOne.GetWorldPitch() * 180/M_PI);
@@ -95,53 +95,6 @@ void loop() {
         Serial.print(imuOne.GetWorldQuaternion3());
         Serial.print(" ");
         Serial.println(imuOne.GetDeltaT()); 
-   }
-   
-   if(imuTwo.Process())
-    {
-        Serial.print("Info2: ");
-        Serial.print(imuTwo.GetWorldYaw() * 180/M_PI);
-        Serial.print(" ");
-        Serial.print(imuTwo.GetWorldPitch() * 180/M_PI);
-        Serial.print(" ");
-        Serial.print(imuTwo.GetWorldRoll() * 180/M_PI);
-        Serial.print(" ");
-        Serial.print(imuTwo.GetWorldAccelX());
-        Serial.print(" ");
-        Serial.print(imuTwo.GetWorldAccelY());
-        Serial.print(" ");
-        Serial.print(imuTwo.GetWorldAccelZ());
-        Serial.print(" ");
-        Serial.print(imuTwo.GetWorldQuaternion0());
-        Serial.print(" ");
-        Serial.print(imuTwo.GetWorldQuaternion1());
-        Serial.print(" ");
-        Serial.print(imuTwo.GetWorldQuaternion2());
-        Serial.print(" ");
-        Serial.print(imuTwo.GetWorldQuaternion3());
-        Serial.print(" ");
-        Serial.println(imuTwo.GetDeltaT()); 
-   }*/
-
-   if(imuOne.Process())
-   {
-      if(imuTwo.Process())
-      {
-         /*Serial.print(imuOne.GetWorldPitch() * 180/M_PI);
-         Serial.print(" ");
-         Serial.println(imuTwo.GetWorldPitch() * 180/M_PI);*/
-         Serial.print(imuOne.GetGravityX());
-         Serial.print(" ");
-         Serial.print(imuOne.GetGravityY());
-         Serial.print(" ");
-         Serial.print(imuOne.GetGravityZ());
-         Serial.print(" ");
-         Serial.print(imuTwo.GetGravityX());
-         Serial.print(" ");
-         Serial.print(imuTwo.GetGravityY());
-         Serial.print(" ");
-         Serial.println(imuTwo.GetGravityZ());
-      }
    }
 }
 
